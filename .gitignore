@@ -2,3 +2,4 @@
 alembic*
 __pycache__
 .env
+*.db
