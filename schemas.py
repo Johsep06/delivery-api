@@ -16,3 +16,10 @@ class PedidoSchemas(BaseModel):
 
     class Config:
         from_attributes = True
+
+class LoginSchemas(BaseModel):
+    email:str
+    senha:str
+    
+    class Config:
+        from_attributes = True
