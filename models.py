@@ -23,7 +23,7 @@ class Usuario(Base):
         self.ativo = ativo
         self.admin = admin
         
-class Pedidos(Base):
+class Pedido(Base):
     __tablename__ = "pedidos"
     
     # STATUS_PEDIDO = (
