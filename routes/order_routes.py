@@ -24,7 +24,7 @@ async def cancelar_pedido(id_pedido:int, usuario:Usuario=Depends(verificar_token
     pedido = session.query(Pedido).filter(Pedido.id == id_pedido).first()
     if not pedido:
         raise HTTPException(status_code=400, detail="Pedido não encontrado")
-    if not usuario.admin or usuario.id != pedido.usuario:
+    if not usuario.admin and usuario.id != pedido.usuario:
         raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
         
     pedido.status = "CANCELADO"
@@ -64,7 +64,7 @@ async def adicionar_item_pedido(id_pedido:int,
     pedido.calcular_preco()
     session.commit()
     return {
-        "msg":"Pedido criado com sucesso",
+        "msg":"Item adicionado ao pedido com sucesso",
         "item_id":item_pedido.id,
         "preco_pedido":pedido.preco,
 
@@ -88,3 +88,18 @@ async def remover_item_pedido(id_item_pedido:int,
     return {
         "msg":"Item removido com sucesso",
     }
+
+@order_router.post("/pedido/finalizar/{id_pedido}")
+async def finalizar_pedido(id_pedido:int,
+                           usuario:Usuario=Depends(verificar_token),
+                           session:Session=Depends(pegar_sessao)
+                            ):
+    pedido = session.query(Pedido).filter(Pedido.id == id_pedido).first()
+    if not pedido:
+        raise HTTPException(status_code=400, detail="Pedido não encontrado")
+    if not usuario.admin and usuario.id != pedido.usuario:
+        raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
+        
+    pedido.status = "FINALIZADO"
+    session.commit()
+    return {"msg":"Pedido finalizado com sucesso"}
