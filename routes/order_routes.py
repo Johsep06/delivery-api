@@ -52,8 +52,6 @@ async def adicionar_item_pedido(id_pedido:int,
     if not pedido:
         raise HTTPException(status_code=400, detail="Pedido Inexistente")
     if not usuario.admin and usuario.id != pedido.usuario:
-        # print("usuario admin:", usuario.admin)
-        # print("dono do pedido:", usuario.id == pedido.usuario)
         raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
     item_pedido = ItemPedido(
         item_pedido_schema.quantidade,
@@ -70,4 +68,23 @@ async def adicionar_item_pedido(id_pedido:int,
         "item_id":item_pedido.id,
         "preco_pedido":pedido.preco,
 
+    }
+    
+@order_router.post("/pedidos/remover-item/{id_item_pedido}")
+async def remover_item_pedido(id_item_pedido:int,
+                                usuario:Usuario=Depends(verificar_token), 
+                                session:Session=Depends(pegar_sessao)
+                                ):
+    item_pedido = session.query(ItemPedido).filter(ItemPedido.id == id_item_pedido).first()
+    pedido = session.query(Pedido).filter(Pedido.id == item_pedido.pedido).first()
+    
+    if not item_pedido:
+        raise HTTPException(status_code=400, detail="Item no Pedido Inexistente")
+    if not usuario.admin and usuario.id != pedido.usuario:
+        raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
+    session.delete(item_pedido)
+    pedido.calcular_preco()
+    session.commit()
+    return {
+        "msg":"Item removido com sucesso",
     }
