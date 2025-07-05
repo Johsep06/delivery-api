@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, Float, ForeignKey
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy_utils.types import ChoiceType
 
 db = create_engine("sqlite:///banco.db")
@@ -26,23 +26,20 @@ class Usuario(Base):
 class Pedido(Base):
     __tablename__ = "pedidos"
     
-    # STATUS_PEDIDO = (
-    #     ("PENDENTE", "PENDENTE"),
-    #     ("CANCELADO", "CANCELADO"),
-    #     ("FINALIZADO", "FINALIZADO"),
-    # )
-    
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     status = Column("status", String)
     usuario = Column("usuario", ForeignKey("usuarios.id"))
     preco = Column("preco", Float)
-    # itens = 
+    itens = relationship("ItemPedido", cascade="all, delete")
     
     def __init__(self, usuario:int, status:str="PENDENTE", preco:float=0) -> None:
         self.usuario = usuario
         self.preco = preco
         self.status = status
         
+    def calcular_preco(self):
+        self.preco = sum(item.quantidade * item.preco_unitario for item in self.itens)
+
 class ItemPedido(Base):
     __tablename__ = "itens_pedido"
 

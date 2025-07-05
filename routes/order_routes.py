@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from schemas import PedidoSchemas
+from schemas import PedidoSchemas, ItemPedidoSchema
 from dependencies import pegar_sessao, verificar_token
-from models import Pedido, Usuario
+from models import Pedido, Usuario, ItemPedido
 
 order_router = APIRouter(prefix="/order", tags=["order"], dependencies=[Depends(verificar_token)])
 
@@ -21,12 +21,53 @@ async def criar_pedido(pedido_schema:PedidoSchemas, session:Session=Depends(pega
 
 @order_router.post("/pedido/cancelar/{id_pedido}")
 async def cancelar_pedido(id_pedido:int, usuario:Usuario=Depends(verificar_token), session:Session=Depends(pegar_sessao)):
-    pedido = session.query(Pedido).filter(Pedido.id==id_pedido).first()
+    pedido = session.query(Pedido).filter(Pedido.id == id_pedido).first()
     if not pedido:
         raise HTTPException(status_code=400, detail="Pedido não encontrado")
-    if not usuario.admin or usuario.id != pedido.id:
+    if not usuario.admin or usuario.id != pedido.usuario:
         raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
         
     pedido.status = "CANCELADO"
     session.commit()
     return {"msg":"Pedido Cancelado com sucesso"}
+
+@order_router.get("/listar")
+async def listar_pedidos(usuario:Usuario=Depends(verificar_token), session:Session=Depends(pegar_sessao)):
+    if not usuario.admin:
+        raise HTTPException(status_code=401, detail="Você não tem autorização para realizar essa ação")
+    else:
+        pedidos = session.query(Pedido).all()
+        return {
+            "pedidos":pedidos
+        }
+
+@order_router.post("/pedidos/adicionar-item/{id_pedido}")
+async def adicionar_item_pedido(id_pedido:int,
+                                item_pedido_schema:ItemPedidoSchema,
+                                usuario:Usuario=Depends(verificar_token), 
+                                session:Session=Depends(pegar_sessao)
+                                ):
+    pedido = session.query(Pedido).filter(Pedido.id == id_pedido).first()
+    
+    if not pedido:
+        raise HTTPException(status_code=400, detail="Pedido Inexistente")
+    if not usuario.admin and usuario.id != pedido.usuario:
+        # print("usuario admin:", usuario.admin)
+        # print("dono do pedido:", usuario.id == pedido.usuario)
+        raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
+    item_pedido = ItemPedido(
+        item_pedido_schema.quantidade,
+        item_pedido_schema.sabor,
+        item_pedido_schema.tamanho,
+        item_pedido_schema.preco_unitario,
+        id_pedido
+    )
+    session.add(item_pedido)
+    pedido.calcular_preco()
+    session.commit()
+    return {
+        "msg":"Pedido criado com sucesso",
+        "item_id":item_pedido.id,
+        "preco_pedido":pedido.preco,
+
+    }
