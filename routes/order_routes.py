@@ -103,3 +103,20 @@ async def finalizar_pedido(id_pedido:int,
     pedido.status = "FINALIZADO"
     session.commit()
     return {"msg":"Pedido finalizado com sucesso"}
+
+@order_router.get("/pedido/{id_pedido}")
+async def vizualizar_pedido(id_pedido:int, 
+                            usuario:Usuario=Depends(verificar_token),
+                            session:Session=Depends(pegar_sessao)
+                            ):
+    
+    pedido = session.query(Pedido).filter(Pedido.id == id_pedido).first()
+    if not pedido:
+        raise HTTPException(status_code=400, detail="Pedido não encontrado")
+    if not usuario.admin and usuario.id != pedido.usuario:
+        raise HTTPException(status_code=401, detail="Você não tem autorização para reaizar essa ação")
+
+    return {
+        "quantidade_itens_pedido":len(pedido.itens),
+        "pedido":pedido
+    }
