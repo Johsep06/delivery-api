@@ -5,6 +5,10 @@ from main import SECRET_KEY, ALGORITHM, oauth2_schema
 
 from models import db, Usuario
 
+# Definição de funções para injeção de dependencias
+
+# função para abrir uma conexão no banco de dados e 
+# garantir que ela será emcerrada
 def pegar_sessao():
     try:
         Session = sessionmaker(bind=db)
@@ -14,6 +18,7 @@ def pegar_sessao():
     finally:
         session.close()
 
+# função para resgatar um token de um usuário e fazer a validação
 def verificar_token(token:str=Depends(oauth2_schema), session:Session=Depends(pegar_sessao)):
     try:
         dic_info = jwt.decode(token, SECRET_KEY, ALGORITHM)

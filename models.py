@@ -1,11 +1,13 @@
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy_utils.types import ChoiceType
 
+# Inicializaçã do banco de dados
 db = create_engine("sqlite:///banco.db")
 
+# Declaração da Base para as classes virarem tabelas no Banco de dados
 Base = declarative_base()
 
+# Definição da classe\tabela de usuários
 class Usuario(Base):
     __tablename__ = "usuarios"
     
@@ -16,6 +18,7 @@ class Usuario(Base):
     ativo = Column("ativo", Boolean)
     admin = Column("admin", Boolean, default=False)
 
+    # Inicialização da classe para o "Insert", na tabela
     def __init__(self, nome:str, email:str, senha:str, ativo:bool=True, admin:bool=False) -> None:
         self.nome = nome
         self.email = email
@@ -23,6 +26,7 @@ class Usuario(Base):
         self.ativo = ativo
         self.admin = admin
         
+# Definição da classe\tabela de pedidos
 class Pedido(Base):
     __tablename__ = "pedidos"
     
@@ -37,9 +41,11 @@ class Pedido(Base):
         self.preco = preco
         self.status = status
         
+    # Definição da função para calcular o preço do pedido
     def calcular_preco(self):
         self.preco = sum(item.quantidade * item.preco_unitario for item in self.itens)
 
+# Definição da classe\tabela de itens do pedido
 class ItemPedido(Base):
     __tablename__ = "itens_pedido"
 

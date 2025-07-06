@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
+# Arquivo para a definição dos schemas para facilitar a 
+# valiação de dados de entrada, estruturar dados de saída e 
+# Documentar a api automáticamente
+
 class UsuarioSchemas(BaseModel):
     nome: str
     email: str
