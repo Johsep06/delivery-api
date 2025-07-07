@@ -14,7 +14,7 @@ A aplicação utiliza <em>JWT (JSON Web Tokens)</em> para autenticação sem est
     <li><strong>FastAPI</strong> – framework web moderno para APIs REST (instalável via pip install fastapi).</li>
     <li><strong>Uvicorn</strong> – servidor ASGI rápido para rodar a aplicação FastAPI (instalável via pip install uvicorn).</li>
     <li><strong>SQLAlchemy</strong> – ORM para mapeamento objeto-relacional, facilitando a interação com o banco de dados.</li>
-    <li><strong>SQLite</strong>strong> – banco de dados relacional leve usado neste protótipo para facilitar testes locais.</li>
+    <li><strong>SQLite</strong> – banco de dados relacional leve usado neste protótipo para facilitar testes locais.</li>
     <li><strong>PyJWT</strong> – biblioteca para gerar e verificar tokens JWT em Python.</li>
     <li><strong>PassLib (bcrypt)</strong> – biblioteca para hashing de senhas de forma segura.</li>
     <li><strong>Pydantic</strong> – usado pelo FastAPI para validação de dados em modelos.</li>
