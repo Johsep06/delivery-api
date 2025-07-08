@@ -38,7 +38,7 @@ A aplicação utiliza <em>JWT (JSON Web Tokens)</em> para autenticação sem est
     alembic revision --autogenerate -m "first migration"
 ```
 
-4. Na raiz do sistema criar o arquivo .env e preencher com variáveis de ambiente com os dados necessários
+4. Na raiz do projeto criar o arquivo .env e preencher com variáveis de ambiente com os dados necessários
 ```
     SECRET_KEY=
     ALGORITHM=
